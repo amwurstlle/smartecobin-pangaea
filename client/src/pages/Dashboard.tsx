@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { TrendingUp, Trash2, AlertTriangle, CheckCircle, Leaf, Recycle, Droplet } from "lucide-react";
+import { TrendingUp, Trash2, AlertTriangle, CheckCircle, Leaf, Recycle } from "lucide-react";
 
 export default function Dashboard() {
   const stats = [
@@ -20,11 +20,8 @@ export default function Dashboard() {
   ];
 
   const categories = [
-    { name: "Plastic", percentage: 35, icon: Recycle, color: "bg-blue-500" },
-    { name: "Paper", percentage: 28, icon: Leaf, color: "bg-emerald-500" },
-    { name: "Glass", percentage: 18, icon: Droplet, color: "bg-cyan-500" },
-    { name: "Metal", percentage: 12, icon: Trash2, color: "bg-gray-500" },
-    { name: "Organic", percentage: 7, icon: Leaf, color: "bg-green-600" },
+    { name: "Organic", percentage: 45, icon: Leaf, color: "bg-green-600" },
+    { name: "Anorganic", percentage: 55, icon: Recycle, color: "bg-blue-500" },
   ];
 
   const maxVolume = Math.max(...trashData.map((d) => d.volume));
@@ -78,19 +75,21 @@ export default function Dashboard() {
 
       <Card className="p-6">
         <h2 className="text-xl font-bold text-foreground mb-6">Trash Categories</h2>
-        <div className="space-y-4">
+        <div className="space-y-6">
           {categories.map((category, index) => {
             const Icon = category.icon;
             return (
-              <div key={index} className="space-y-2" data-testid={`category-${index}`}>
+              <div key={index} className="space-y-3" data-testid={`category-${index}`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Icon className="w-5 h-5 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{category.name}</span>
+                    <div className={`p-3 rounded-xl ${category.color}`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="font-semibold text-foreground text-lg">{category.name}</span>
                   </div>
-                  <span className="text-sm font-semibold text-foreground">{category.percentage}%</span>
+                  <span className="text-xl font-bold text-foreground">{category.percentage}%</span>
                 </div>
-                <div className="h-2 bg-secondary rounded-full overflow-hidden">
+                <div className="h-3 bg-secondary rounded-full overflow-hidden">
                   <div className={`h-full ${category.color} rounded-full transition-all duration-500`} style={{ width: `${category.percentage}%` }}></div>
                 </div>
               </div>

@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MapPin, Navigation, X, AlertCircle } from "lucide-react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function TrashMonitoring() {
   const [selectedBin, setSelectedBin] = useState<any | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const bins = [
     { id: 1, name: "Central Park Bin A", lat: 40.7829, lng: -73.9654, status: "normal", fill: 45, type: "Recycling" },
@@ -17,6 +21,19 @@ export default function TrashMonitoring() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "normal":
+        return "#10b981";
+      case "warning":
+        return "#f59e0b";
+      case "critical":
+        return "#ef4444";
+      default:
+        return "#6b7280";
+    }
+  };
+
+  const getStatusBgColor = (status: string) => {
+    switch (status) {
+      case "normal":
         return "bg-green-500";
       case "warning":
         return "bg-amber-500";
@@ -27,60 +44,113 @@ export default function TrashMonitoring() {
     }
   };
 
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    const map = L.map(mapContainerRef.current).setView([40.7614, -73.9776], 13);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+
+    bins.forEach((bin) => {
+      const color = getStatusColor(bin.status);
+      
+      const markerHtml = `
+        <div style="
+          width: 32px;
+          height: 32px;
+          background-color: ${color};
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: transform 0.2s;
+        " onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+        </div>
+      `;
+
+      const icon = L.divIcon({
+        html: markerHtml,
+        className: "",
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+      });
+
+      const marker = L.marker([bin.lat, bin.lng], { icon }).addTo(map);
+      
+      marker.on("click", () => {
+        setSelectedBin(bin);
+        map.setView([bin.lat, bin.lng], 15);
+      });
+
+      const popupContent = `
+        <div style="font-family: Poppins, sans-serif; min-width: 150px;">
+          <strong style="font-size: 14px; color: #1f2937;">${bin.name}</strong><br/>
+          <span style="color: #6b7280; font-size: 12px;">${bin.type}</span><br/>
+          <span style="color: ${color}; font-weight: 600; font-size: 12px;">Fill: ${bin.fill}%</span>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+    });
+
+    mapRef.current = map;
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
   return (
     <div className="relative h-screen pb-20">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-100 to-teal-100">
-        <div className="relative w-full h-full">
-          {bins.map((bin) => (
-            <button
-              key={bin.id}
-              className={`absolute w-10 h-10 ${getStatusColor(bin.status)} rounded-full border-4 border-white shadow-lg hover:scale-110 transition-transform cursor-pointer`}
-              style={{
-                left: `${20 + bin.id * 15}%`,
-                top: `${30 + (bin.id % 3) * 20}%`,
-              }}
-              onClick={() => setSelectedBin(bin)}
-              data-testid={`marker-bin-${bin.id}`}
-            >
-              <MapPin className="w-4 h-4 text-white mx-auto" />
-            </button>
-          ))}
-        </div>
+      <div ref={mapContainerRef} className="absolute inset-0" style={{ zIndex: 0 }} data-testid="map-container"></div>
 
-        <div className="absolute top-4 left-4 right-4 z-10">
-          <Card className="p-4 glassmorphism">
-            <div className="flex items-center gap-3">
-              <Button size="icon" variant="ghost" className="rounded-full" data-testid="button-locate">
-                <Navigation className="w-5 h-5" />
-              </Button>
-              <input
-                type="text"
-                placeholder="Search locations..."
-                className="flex-1 bg-white/80 border-0 rounded-xl h-10 px-4 text-sm"
-                data-testid="input-search"
-              />
-            </div>
-          </Card>
-        </div>
+      <div className="absolute top-4 left-4 right-4 z-10">
+        <Card className="p-4 glassmorphism">
+          <div className="flex items-center gap-3">
+            <Button size="icon" variant="ghost" className="rounded-full" data-testid="button-locate">
+              <Navigation className="w-5 h-5" />
+            </Button>
+            <input
+              type="text"
+              placeholder="Search locations..."
+              className="flex-1 bg-white/80 border-0 rounded-xl h-10 px-4 text-sm"
+              data-testid="input-search"
+            />
+          </div>
+        </Card>
+      </div>
 
-        <div className="absolute top-20 right-4 z-10 space-y-2">
-          <Card className="p-3 glassmorphism">
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-foreground font-medium">Normal</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                <span className="text-foreground font-medium">80% Full</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-foreground font-medium">Critical</span>
-              </div>
+      <div className="absolute bottom-24 right-4 z-10">
+        <Card className="p-4 glassmorphism">
+          <h3 className="text-xs font-bold text-foreground mb-3">Bin Status</h3>
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+              <span className="text-foreground font-medium">Normal</span>
             </div>
-          </Card>
-        </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-amber-500 rounded-full border-2 border-white"></div>
+              <span className="text-foreground font-medium">Almost Full</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-white"></div>
+              <span className="text-foreground font-medium">Full</span>
+            </div>
+          </div>
+        </Card>
       </div>
 
       {selectedBin && (
@@ -104,7 +174,7 @@ export default function TrashMonitoring() {
                 </div>
                 <div className="h-3 bg-secondary rounded-full overflow-hidden">
                   <div
-                    className={`h-full ${getStatusColor(selectedBin.status)} transition-all duration-500`}
+                    className={`h-full ${getStatusBgColor(selectedBin.status)} transition-all duration-500`}
                     style={{ width: `${selectedBin.fill}%` }}
                   ></div>
                 </div>
