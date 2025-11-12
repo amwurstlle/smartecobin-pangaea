@@ -52,7 +52,7 @@ export default function Notifications() {
   };
 
   return (
-    <div className="p-6 space-y-6 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-teal-50 via-emerald-50 to-green-50 p-6 space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">Notifications</h1>

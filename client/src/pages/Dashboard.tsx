@@ -27,7 +27,7 @@ export default function Dashboard() {
   const maxVolume = Math.max(...trashData.map((d) => d.volume));
 
   return (
-    <div className="p-6 space-y-6 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-6 space-y-6 pb-24">
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
         <p className="text-muted-foreground">Monitor your eco-bin network performance</p>

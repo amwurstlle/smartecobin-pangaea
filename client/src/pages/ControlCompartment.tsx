@@ -24,7 +24,7 @@ export default function ControlCompartment() {
   ];
 
   return (
-    <div className="p-6 space-y-6 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 p-6 space-y-6 pb-24">
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Control Panel</h1>
         <p className="text-muted-foreground">Manage bin operations and system settings</p>

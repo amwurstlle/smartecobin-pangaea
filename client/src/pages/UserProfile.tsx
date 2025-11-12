@@ -23,7 +23,7 @@ export default function UserProfile({ onLogout }: { onLogout: () => void }) {
   };
 
   return (
-    <div className="p-6 space-y-6 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 p-6 space-y-6 pb-24">
       <div>
         <h1 className="text-3xl font-bold text-foreground mb-2">Profile</h1>
         <p className="text-muted-foreground">Manage your account and preferences</p>

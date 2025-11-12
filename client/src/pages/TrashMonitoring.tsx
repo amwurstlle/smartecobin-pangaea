@@ -114,7 +114,7 @@ export default function TrashMonitoring() {
   }, []);
 
   return (
-    <div className="relative h-screen pb-20">
+    <div className="relative h-screen pb-20 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       <div ref={mapContainerRef} className="absolute inset-0" style={{ zIndex: 0 }} data-testid="map-container"></div>
 
       <div className="absolute top-4 left-4 right-4 z-10">

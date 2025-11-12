@@ -24,7 +24,7 @@ export default function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: s
   ];
 
   return (
-    <div className="min-h-screen bg-background p-4 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 p-4 flex items-center justify-center">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-3">Select Your Role</h1>
