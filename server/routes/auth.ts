@@ -2,13 +2,18 @@ import { Router, type Request, type Response } from "express";
 import { getSupabase, getSupabaseAdmin } from "../lib/supabase";
 import {
   hashPassword,
-  verifyPassword,
   createToken,
   authenticateToken,
   type JWTPayload,
 } from "../utils/auth";
 
 export const authRouter = Router();
+
+// Simple in-memory throttle per email to avoid rapid re-requests to Supabase (10s rule)
+const lastRegisterRequestByEmail = new Map<string, number>();
+const REGISTER_MIN_INTERVAL_MS = 12_000; // 12s to be safe
+const lastResendRequestByEmail = new Map<string, number>();
+const RESEND_MIN_INTERVAL_MS = 12_000;
 
 interface RegisterRequest {
   name: string;
@@ -29,114 +34,138 @@ authRouter.post(
     try {
       const { name, email, password, phone } = req.body;
 
-      // Validation
       if (!name || !email || !password) {
         return res.status(400).json({
           error: "Missing required fields: name, email, password",
         });
       }
-
       if (password.length < 6) {
-        return res.status(400).json({
-          error: "Password must be at least 6 characters",
-        });
+        return res.status(400).json({ error: "Password must be at least 6 characters" });
       }
 
-  const supabase = getSupabase();
-  const supabaseAdmin = getSupabaseAdmin();
+      // Throttle to respect Supabase email limit (security: 10s)
+      const now = Date.now();
+      const lastAt = lastRegisterRequestByEmail.get(email);
+      if (lastAt && now - lastAt < REGISTER_MIN_INTERVAL_MS) {
+        const waitSec = Math.ceil((REGISTER_MIN_INTERVAL_MS - (now - lastAt)) / 1000);
+        return res.status(429).json({ error: `Please wait ${waitSec}s before requesting another confirmation email.` });
+      }
 
-      // Check if user already exists
-      const { data: existingUser, error: checkError } = await supabase
+      const supabase = getSupabase();
+      const admin = getSupabaseAdmin();
+
+      // Ensure no duplicate profile in our users table (use admin to bypass RLS)
+      const { data: existingUser, error: checkError } = await admin
         .from("users")
         .select("id")
         .eq("email", email)
-        .single();
-
-      if (checkError && checkError.code !== "PGRST116") {
-        // PGRST116 = not found
-        console.error("Error checking existing user:", checkError);
-        return res.status(500).json({
-          error: "Database error",
-          details: checkError.message,
-        });
+        .maybeSingle();
+      if (checkError) {
+        // Be tolerant: if table missing or RLS/policy issues, do not block registration
+        console.warn("Warning checking existing user (ignored):", checkError);
       }
-
       if (existingUser) {
-        return res.status(409).json({
-          error: "User with this email already exists",
-        });
+        return res.status(409).json({ error: "User with this email already exists" });
       }
 
-      // Hash password
-      const passwordHash = await hashPassword(password);
-
-      // Create Supabase Auth user (so user appears in Supabase Auth)
-      let authUser: any = null;
-      try {
-        const { data: createdAuthUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
-          email,
-          password,
-          user_metadata: { name, phone },
-        } as any);
-
-        if (authError) {
-          console.error("Error creating Supabase Auth user:", authError);
-          // continue to attempt to create profile, but prefer to fail early
-          return res.status(500).json({ error: "Failed to create auth user", details: authError.message });
+      // Use Supabase Auth signUp to trigger email confirmation
+      const redirectTo = process.env.EMAIL_CONFIRM_REDIRECT_TO || "http://localhost:5000";
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectTo,
+          data: { name, phone },
+        },
+      });
+      if (signUpError) {
+        console.error("Supabase signUp error:", signUpError);
+        // Map rate-limit error to 429 for clarity
+        const message = signUpError.message || "Registration failed";
+        if (message.toLowerCase().includes("only request this after 10 seconds")) {
+          lastRegisterRequestByEmail.set(email, Date.now());
+          return res.status(429).json({ error: "Terlalu cepat. Silakan coba lagi dalam 10 detik." });
         }
-
-        authUser = createdAuthUser;
-      } catch (err) {
-        console.error("Auth admin.createUser threw:", err);
-        return res.status(500).json({ error: "Failed to create auth user", details: err instanceof Error ? err.message : String(err) });
+        return res.status(400).json({ error: message });
       }
 
-      // Create user profile in users table with the same id as the auth user
-      const { data: newUser, error: insertError } = await supabase
+      const authUserId = signUpData.user?.id;
+      if (!authUserId) {
+        return res.status(500).json({ error: "Failed to create auth user" });
+      }
+
+      // Keep local profile row in sync (optional password_hash retained for legacy compatibility)
+      const passwordHash = await hashPassword(password);
+      const { data: newUser, error: insertError } = await admin
         .from("users")
         .insert({
-          id: authUser?.id || undefined,
+          id: authUserId,
           name,
           email,
           password_hash: passwordHash,
           phone: phone || null,
-          role: "public", // Default role
+          role: "public",
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .select("id, name, email, phone, role, created_at")
         .single();
-
       if (insertError) {
-        console.error("Error creating user:", insertError);
-        return res.status(500).json({
-          error: "Failed to create user",
-          details: insertError.message,
-        });
+        // Do not block registration: profile will be auto-created on first login
+        console.warn("User profile insert failed (ignored; will auto-create on login):", insertError);
       }
 
-      // Create JWT token
-      const token = createToken({
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name,
-        role: newUser.role,
-      });
-
+      lastRegisterRequestByEmail.set(email, Date.now());
       return res.status(201).json({
-        message: "User registered successfully",
-        token,
-        user: newUser,
+        message: "Registrasi berhasil. Cek email untuk konfirmasi akun.",
+        user: newUser || { id: authUserId, name, email, phone: phone || null, role: 'public' },
       });
     } catch (err) {
       console.error("Register error:", err);
-      return res.status(500).json({
-        error: "Internal server error",
-        details: err instanceof Error ? err.message : "Unknown error",
-      });
+      return res.status(500).json({ error: "Internal server error", details: err instanceof Error ? err.message : "Unknown error" });
     }
   }
 );
+
+// POST /api/auth/resend-confirmation - resend signup confirmation email
+authRouter.post('/resend-confirmation', async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body as { email?: string };
+    if (!email) {
+      return res.status(400).json({ error: 'Missing email' });
+    }
+
+    const now = Date.now();
+    const lastAt = lastResendRequestByEmail.get(email);
+    if (lastAt && now - lastAt < RESEND_MIN_INTERVAL_MS) {
+      const waitSec = Math.ceil((RESEND_MIN_INTERVAL_MS - (now - lastAt)) / 1000);
+      return res.status(429).json({ error: `Please wait ${waitSec}s before resending confirmation.` });
+    }
+
+    const supabase = getSupabase();
+    const redirectTo = process.env.EMAIL_CONFIRM_REDIRECT_TO || 'http://localhost:5000';
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: redirectTo }
+    });
+
+    if (error) {
+      const msg = error.message || 'Failed to resend confirmation';
+      if (msg.toLowerCase().includes('only request this after 10 seconds')) {
+        lastResendRequestByEmail.set(email, Date.now());
+        return res.status(429).json({ error: 'Terlalu cepat. Coba lagi dalam 10 detik.' });
+      }
+      return res.status(400).json({ error: msg });
+    }
+
+    lastResendRequestByEmail.set(email, Date.now());
+    return res.json({ message: 'Email konfirmasi dikirim ulang. Periksa inbox/spam.' });
+  } catch (err) {
+    console.error('Resend confirmation error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // POST /api/auth/login - User login
 authRouter.post(
@@ -144,76 +173,177 @@ authRouter.post(
   async (req: Request<{}, {}, LoginRequest>, res: Response) => {
     try {
       const { email, password } = req.body;
-
-      // Validation
       if (!email || !password) {
-        return res.status(400).json({
-          error: "Missing required fields: email, password",
-        });
+        return res.status(400).json({ error: "Missing required fields: email, password" });
       }
 
       const supabase = getSupabase();
+      const admin = getSupabaseAdmin();
 
-      // Get user by email
-      const { data: user, error: userError } = await supabase
-        .from("users")
-        .select("id, name, email, password_hash, phone, role, avatar_url")
-        .eq("email", email)
-        .single();
-
-      if (userError || !user) {
-        console.error("User not found:", userError);
-        return res.status(401).json({
-          error: "Invalid email or password",
-        });
+      // Delegate credential check to Supabase Auth (enforces email confirmation if enabled)
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError || !signInData.user) {
+        return res.status(401).json({ error: signInError?.message || "Invalid email or password" });
       }
 
-      // Verify password
-      const isPasswordValid = await verifyPassword(
-        password,
-        user.password_hash
-      );
+      // Try to load profile by Auth ID first, then fallback to email
+      let user: any | null = null;
+      let userError: any | null = null;
+      {
+        const byId = await admin
+          .from("users")
+          .select("id, name, email, phone, role, avatar_url")
+          .eq("id", signInData.user.id)
+          .maybeSingle();
+        if (!byId.error && byId.data) {
+          user = byId.data;
+        } else {
+          const byEmail = await admin
+            .from("users")
+            .select("id, name, email, phone, role, avatar_url")
+            .eq("email", email)
+            .maybeSingle();
+          user = byEmail.data ?? null;
+          userError = byId.error && !byEmail.data ? byId.error : byEmail.error;
+        }
+      }
 
-      if (!isPasswordValid) {
-        return res.status(401).json({
-          error: "Invalid email or password",
-        });
+      // If profile missing (legacy or earlier schema failures), create it on-the-fly using service role
+      if (userError || !user) {
+        const authUser = signInData.user;
+        const fallbackName = (authUser.user_metadata as any)?.name || (authUser.email?.split("@")[0] ?? "User");
+        const passwordHash = await hashPassword("auth-managed");
+
+        const insertRes = await admin
+          .from("users")
+          .insert({
+            id: authUser.id,
+            name: fallbackName,
+            email: authUser.email,
+            password_hash: passwordHash,
+            phone: (authUser.user_metadata as any)?.phone ?? null,
+            role: "public",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .select("id, name, email, phone, role, avatar_url")
+          .single();
+
+        if (insertRes.error) {
+          const code: any = (insertRes.error as any).code;
+          const msg = insertRes.error.message || "";
+          // If unique violation on email, fetch existing row by email and continue
+          if (code === '23505' || /duplicate key value/i.test(msg)) {
+            const exist = await admin
+              .from("users")
+              .select("id, name, email, phone, role, avatar_url")
+              .eq("email", authUser.email as string)
+              .maybeSingle();
+            if (!exist.error && exist.data) {
+              user = exist.data;
+            } else {
+              console.error("Auto-create conflict but failed to fetch existing:", exist.error);
+              // Proceed with Auth-only user instead of failing
+              user = {
+                id: authUser.id,
+                name: fallbackName,
+                email: authUser.email as string,
+                phone: (authUser.user_metadata as any)?.phone ?? null,
+                role: 'public',
+                avatar_url: (authUser.user_metadata as any)?.avatar_url ?? null,
+              };
+            }
+          } else {
+            // Attempt a minimal insert as a universal fallback (handles not-null/unknown columns)
+            const fallbackHash = await hashPassword("auth-managed");
+            const minimal = await admin
+              .from("users")
+              .insert({ id: authUser.id, name: fallbackName, email: authUser.email, password_hash: fallbackHash, role: 'public' })
+              .select("id, name, email, phone, role, avatar_url")
+              .maybeSingle();
+            if (!minimal.error && minimal.data) {
+              user = minimal.data;
+            } else if ((minimal.error as any)?.code === '23505' || /duplicate key value/i.test((minimal.error as any)?.message || '')) {
+              // If minimal insert hit duplicate, fetch and continue
+              const exist2 = await admin
+                .from("users")
+                .select("id, name, email, phone, role, avatar_url")
+                .eq("email", authUser.email as string)
+                .maybeSingle();
+              if (!exist2.error && exist2.data) {
+                user = exist2.data;
+              } else {
+                console.error("Minimal insert duplicate but fetch failed:", exist2.error);
+                // Proceed with Auth-only user instead of failing
+                user = {
+                  id: authUser.id,
+                  name: fallbackName,
+                  email: authUser.email as string,
+                  phone: (authUser.user_metadata as any)?.phone ?? null,
+                  role: 'public',
+                  avatar_url: (authUser.user_metadata as any)?.avatar_url ?? null,
+                };
+              }
+            } else if ((insertRes.error as any).code === 'PGRST204' || (minimal.error as any)?.code === 'PGRST204') {
+              console.warn('Schema not fully deployed; proceeding with Auth-only user for now.');
+              user = {
+                id: authUser.id,
+                name: fallbackName,
+                email: authUser.email as string,
+                phone: (authUser.user_metadata as any)?.phone ?? null,
+                role: 'public',
+                avatar_url: (authUser.user_metadata as any)?.avatar_url ?? null,
+              };
+            } else {
+              console.error("Auto-create profile failed (fallback too):", insertRes.error, minimal.error);
+              // Proceed with Auth-only user to avoid blocking login
+              user = {
+                id: authUser.id,
+                name: fallbackName,
+                email: authUser.email as string,
+                phone: (authUser.user_metadata as any)?.phone ?? null,
+                role: 'public',
+                avatar_url: (authUser.user_metadata as any)?.avatar_url ?? null,
+              };
+            }
+          }
+        } else {
+          user = insertRes.data;
+        }
       }
 
       // Update last_login
-      await supabase
-        .from("users")
-        .update({
-          last_login: new Date().toISOString(),
-        })
-        .eq("id", user.id);
+      try {
+        await admin
+          .from("users")
+          .update({ last_login: new Date().toISOString() })
+          .eq("id", user.id);
+      } catch (e) {
+        console.warn('Failed to update last_login (non-fatal):', e);
+      }
 
-      // Create JWT token
-      const token = createToken({
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      });
+      // Prefer users table data; if absent, fallback to Supabase Auth user metadata
+      const authUser = signInData.user;
+      const merged = {
+        id: user?.id ?? authUser.id,
+        name: user?.name ?? ((authUser.user_metadata as any)?.name || (authUser.email?.split("@")[0] ?? "User")),
+        email: user?.email ?? (authUser.email as string),
+        phone: user?.phone ?? ((authUser.user_metadata as any)?.phone ?? null),
+        role: user?.role ?? ((authUser.user_metadata as any)?.role ?? "public"),
+        avatar_url: user?.avatar_url ?? ((authUser.user_metadata as any)?.avatar_url ?? null),
+      };
+
+      // Issue our API JWT for backend routes from merged profile
+      const token = createToken({ id: merged.id, email: merged.email, name: merged.name, role: merged.role });
 
       return res.status(200).json({
         message: "Login successful",
         token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-          avatar_url: user.avatar_url,
-        },
+        user: merged,
       });
     } catch (err) {
       console.error("Login error:", err);
-      return res.status(500).json({
-        error: "Internal server error",
-        details: err instanceof Error ? err.message : "Unknown error",
-      });
+      return res.status(500).json({ error: "Internal server error", details: err instanceof Error ? err.message : "Unknown error" });
     }
   }
 );
@@ -229,10 +359,10 @@ authRouter.get("/me", authenticateToken, async (req: any, res: Response) => {
       });
     }
 
-    const supabase = getSupabase();
+    const admin = getSupabaseAdmin();
 
     // Get full user data
-    const { data: userData, error: userError } = await supabase
+    const { data: userData, error: userError } = await admin
       .from("users")
       .select(
         "id, name, email, phone, role, avatar_url, created_at, last_login, updated_at"

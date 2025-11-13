@@ -11,11 +11,19 @@ Your Supabase project needs the database schema (users, trash_bins, notification
 1. In the left sidebar, click **"SQL Editor"**
 2. Click **"New Query"** (top right)
 
-## Step 3: Copy and Paste the Schema
+## Step 3: Copy and Paste the Schema (Fresh Setup)
 1. Open the file `SUPABASE_SCHEMA.sql` from your project root
 2. Copy **ALL** the SQL code
 3. Paste it into the SQL Editor in Supabase
 4. Click **"Run"** button (bottom right, or press Ctrl+Enter)
+
+## If You Already Have Tables (Legacy Structure)
+If your database already has tables and you see errors like `column "field_officer_id" does not exist` or `column "name" does not exist`, run the migration below first. It will add the columns expected by the backend without deleting your data.
+
+1. Open the file `migrations/001_add_missing_columns.sql` in this repo
+2. Copy ALL SQL inside it
+3. Paste into Supabase SQL Editor and click Run (safe to run multiple times)
+4. After that, you can re-run parts of `SUPABASE_SCHEMA.sql` if you want sample data
 
 ## Step 4: Verify Tables Were Created
 1. Click **"Table Editor"** in the left sidebar

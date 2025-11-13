@@ -12,6 +12,8 @@ Thumbs.db
 # Environment
 .env
 .env.*
+client/.env
+client/.env.*
 
 # Local and IDE
 .vscode/
