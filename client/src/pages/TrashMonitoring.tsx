@@ -11,11 +11,11 @@ export default function TrashMonitoring() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const bins = [
-    { id: 1, name: "Central Park Bin A", lat: 40.7829, lng: -73.9654, status: "normal", fill: 45, type: "Recycling" },
-    { id: 2, name: "Main Street Bin B", lat: 40.7589, lng: -73.9851, status: "warning", fill: 82, type: "General Waste" },
-    { id: 3, name: "Plaza Bin C", lat: 40.7614, lng: -73.9776, status: "critical", fill: 95, type: "Organic" },
-    { id: 4, name: "Park Avenue Bin D", lat: 40.7580, lng: -73.9855, status: "normal", fill: 28, type: "Recycling" },
-    { id: 5, name: "Downtown Bin E", lat: 40.7489, lng: -73.9680, status: "warning", fill: 78, type: "General Waste" },
+    { id: 1, name: "Central Park Bin A", lat: 40.7829, lng: -73.9654, status: "normal", fill: 45, type: "Daur Ulang" },
+    { id: 2, name: "Main Street Bin B", lat: 40.7589, lng: -73.9851, status: "warning", fill: 82, type: "Sampah Umum" },
+    { id: 3, name: "Plaza Bin C", lat: 40.7614, lng: -73.9776, status: "critical", fill: 95, type: "Organik" },
+    { id: 4, name: "Park Avenue Bin D", lat: 40.7580, lng: -73.9855, status: "normal", fill: 28, type: "Daur Ulang" },
+    { id: 5, name: "Downtown Bin E", lat: 40.7489, lng: -73.9680, status: "warning", fill: 78, type: "Sampah Umum" },
   ];
 
   const getStatusColor = (status: string) => {
@@ -96,7 +96,7 @@ export default function TrashMonitoring() {
         <div style="font-family: Poppins, sans-serif; min-width: 150px;">
           <strong style="font-size: 14px; color: #1f2937;">${bin.name}</strong><br/>
           <span style="color: #6b7280; font-size: 12px;">${bin.type}</span><br/>
-          <span style="color: ${color}; font-weight: 600; font-size: 12px;">Fill: ${bin.fill}%</span>
+          <span style="color: ${color}; font-weight: 600; font-size: 12px;">Kepenuhan: ${bin.fill}%</span>
         </div>
       `;
       
@@ -125,7 +125,7 @@ export default function TrashMonitoring() {
             </Button>
             <input
               type="text"
-              placeholder="Search locations..."
+              placeholder="Cari lokasi..."
               className="flex-1 bg-white/80 border-0 rounded-xl h-10 px-4 text-sm"
               data-testid="input-search"
             />
@@ -135,7 +135,7 @@ export default function TrashMonitoring() {
 
       <div className="absolute bottom-24 right-4 z-10">
         <Card className="p-4 glassmorphism">
-          <h3 className="text-xs font-bold text-foreground mb-3">Bin Status</h3>
+          <h3 className="text-xs font-bold text-foreground mb-3">Status Bak</h3>
           <div className="space-y-2 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
@@ -143,11 +143,11 @@ export default function TrashMonitoring() {
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-amber-500 rounded-full border-2 border-white"></div>
-              <span className="text-foreground font-medium">Almost Full</span>
+              <span className="text-foreground font-medium">Hampir Penuh</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-white"></div>
-              <span className="text-foreground font-medium">Full</span>
+              <span className="text-foreground font-medium">Penuh</span>
             </div>
           </div>
         </Card>
@@ -169,7 +169,7 @@ export default function TrashMonitoring() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-foreground">Fill Level</span>
+                  <span className="text-sm font-medium text-foreground">Tingkat Kepenuhan</span>
                   <span className="text-sm font-bold text-foreground">{selectedBin.fill}%</span>
                 </div>
                 <div className="h-3 bg-secondary rounded-full overflow-hidden">
@@ -183,17 +183,17 @@ export default function TrashMonitoring() {
               {selectedBin.status !== "normal" && (
                 <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg border border-amber-200">
                   <AlertCircle className="w-5 h-5 text-amber-600" />
-                  <span className="text-sm text-amber-900">This bin requires attention soon</span>
+                  <span className="text-sm text-amber-900">Bak ini memerlukan perhatian segera</span>
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <Button variant="outline" className="rounded-xl" data-testid="button-directions">
                   <Navigation className="w-4 h-4 mr-2" />
-                  Directions
+                  Arah
                 </Button>
                 <Button className="rounded-xl eco-gradient text-white" data-testid="button-collect">
-                  Schedule Collection
+                  Jadwalkan Pengangkutan
                 </Button>
               </div>
             </div>

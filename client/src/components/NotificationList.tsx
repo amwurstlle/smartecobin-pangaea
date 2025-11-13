@@ -65,14 +65,14 @@ export default function NotificationList({
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
 
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1) return "Baru saja";
+    if (diffMins < 60) return `${diffMins} menit lalu`;
 
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return `${diffHours} jam lalu`;
 
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return `${diffDays} hari lalu`;
   };
 
   if (loading) {
@@ -91,9 +91,9 @@ export default function NotificationList({
     return (
       <Card className="p-8 text-center">
         <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-        <p className="text-muted-foreground">No notifications yet</p>
+        <p className="text-muted-foreground">Belum ada notifikasi</p>
         <p className="text-xs text-muted-foreground mt-1">
-          All your trash bins are in good condition
+          Semua bak sampah dalam kondisi baik
         </p>
       </Card>
     );
@@ -104,10 +104,10 @@ export default function NotificationList({
       {/* Header with unread count and mark all read */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="font-bold text-foreground">Notifications</h3>
+          <h3 className="font-bold text-foreground">Notifikasi</h3>
           {unreadCount > 0 && (
             <p className="text-xs text-muted-foreground">
-              {unreadCount} unread notification{unreadCount !== 1 ? "s" : ""}
+              {unreadCount} notifikasi belum dibaca
             </p>
           )}
         </div>
@@ -118,7 +118,7 @@ export default function NotificationList({
             onClick={onMarkAllRead}
             className="text-xs"
           >
-            Mark all as read
+            Tandai semua sudah dibaca
           </Button>
         )}
       </div>
@@ -140,7 +140,7 @@ export default function NotificationList({
                 <button
                   onClick={() => onDelete?.(notification.id)}
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  title="Delete notification"
+                  title="Hapus notifikasi"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -165,7 +165,7 @@ export default function NotificationList({
                     onClick={() => onMarkRead(notification.id)}
                     className="h-6 text-xs"
                   >
-                    Mark as read
+                    Tandai sudah dibaca
                   </Button>
                 )}
               </div>

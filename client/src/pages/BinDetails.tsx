@@ -80,7 +80,7 @@ export default function BinDetails() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch bin details");
+          throw new Error("Gagal mengambil detail bak");
         }
 
         const data: BinDetailsResponse = await response.json();
@@ -88,7 +88,7 @@ export default function BinDetails() {
         setFieldOfficer(data.bin.fieldOfficer);
         setRecentNotifications(data.bin.recentNotifications);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
+  setError(err instanceof Error ? err.message : "Terjadi kesalahan");
       } finally {
         setLoading(false);
       }
@@ -104,7 +104,7 @@ export default function BinDetails() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full border-4 border-green-300 border-t-green-600 animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading bin details...</p>
+          <p className="text-gray-600">Memuat detail bak...</p>
         </div>
       </div>
     );
@@ -118,11 +118,11 @@ export default function BinDetails() {
             onClick={() => navigate(-1)}
             className="mb-6 inline-flex items-center text-green-600 hover:text-green-700"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" /> Back
+            <ArrowLeft className="w-5 h-5 mr-2" /> Kembali
           </button>
           <Card className="p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <p className="text-red-600">{error || "Bin not found"}</p>
+            <p className="text-red-600">{error || "Bak tidak ditemukan"}</p>
           </Card>
         </div>
       </div>
@@ -131,8 +131,8 @@ export default function BinDetails() {
 
   const statusConfig = {
     normal: { color: "bg-green-100", textColor: "text-green-800", label: "Normal", icon: CheckCircle },
-    warning: { color: "bg-yellow-100", textColor: "text-yellow-800", label: "Warning", icon: AlertCircle },
-    full: { color: "bg-red-100", textColor: "text-red-800", label: "Full", icon: AlertCircle },
+    warning: { color: "bg-yellow-100", textColor: "text-yellow-800", label: "Peringatan", icon: AlertCircle },
+    full: { color: "bg-red-100", textColor: "text-red-800", label: "Penuh", icon: AlertCircle },
   };
 
   const config = statusConfig[bin.status];
@@ -147,7 +147,7 @@ export default function BinDetails() {
             onClick={() => navigate(-1)}
             className="inline-flex items-center text-green-600 hover:text-green-700 mb-4"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" /> Back
+            <ArrowLeft className="w-5 h-5 mr-2" /> Kembali
           </button>
 
           <div className="flex items-start justify-between gap-4">
@@ -187,10 +187,10 @@ export default function BinDetails() {
 
         {/* Main Content Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-6">
-          {/* Fill Level */}
+          {/* Tingkat Kepenuhan */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900">Fill Level</h3>
+              <h3 className="font-semibold text-gray-900">Tingkat Kepenuhan</h3>
               <Trash2 className="w-5 h-5 text-gray-400" />
             </div>
             <div className="text-3xl font-bold text-green-600 mb-2">{bin.fill_level}%</div>
@@ -206,13 +206,13 @@ export default function BinDetails() {
                 style={{ width: `${bin.fill_level}%` }}
               ></div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">{bin.capacity}L capacity</p>
+            <p className="text-sm text-gray-500 mt-2">Kapasitas {bin.capacity}L</p>
           </Card>
 
-          {/* Battery Level */}
+          {/* Baterai */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900">Battery</h3>
+              <h3 className="font-semibold text-gray-900">Baterai</h3>
               <Zap className="w-5 h-5 text-gray-400" />
             </div>
             <div className="text-3xl font-bold text-blue-600 mb-2">{bin.battery_level}%</div>
@@ -224,32 +224,32 @@ export default function BinDetails() {
                 style={{ width: `${bin.battery_level}%` }}
               ></div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">Sensor ID: {bin.sensor_id}</p>
+            <p className="text-sm text-gray-500 mt-2">ID Sensor: {bin.sensor_id}</p>
           </Card>
 
-          {/* Updated */}
+          {/* Pembaruan */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900">Last Updated</h3>
+              <h3 className="font-semibold text-gray-900">Terakhir Diperbarui</h3>
               <Clock className="w-5 h-5 text-gray-400" />
             </div>
             <p className="text-sm text-gray-600 mb-3">
               {new Date(bin.updated_at).toLocaleString()}
             </p>
             <div className="space-y-1 text-xs text-gray-500">
-              <p>Created: {new Date(bin.created_at).toLocaleDateString()}</p>
+              <p>Dibuat: {new Date(bin.created_at).toLocaleDateString()}</p>
             </div>
           </Card>
         </div>
 
-        {/* Collection Schedule */}
+        {/* Jadwal Pengangkutan */}
         {(bin.last_collection || bin.next_collection) && (
           <Card className="p-6 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Collection Schedule</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">Jadwal Pengangkutan</h3>
             <div className="grid md:grid-cols-2 gap-4">
               {bin.last_collection && (
                 <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-1">Last Collection</p>
+                  <p className="text-sm text-gray-600 mb-1">Pengangkutan Terakhir</p>
                   <p className="font-semibold text-gray-900">
                     {new Date(bin.last_collection).toLocaleDateString()}
                   </p>
@@ -260,7 +260,7 @@ export default function BinDetails() {
               )}
               {bin.next_collection && (
                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                  <p className="text-sm text-gray-600 mb-1">Next Collection</p>
+                  <p className="text-sm text-gray-600 mb-1">Pengangkutan Berikutnya</p>
                   <p className="font-semibold text-gray-900">
                     {new Date(bin.next_collection).toLocaleDateString()}
                   </p>
@@ -273,10 +273,10 @@ export default function BinDetails() {
           </Card>
         )}
 
-        {/* Field Officer */}
+        {/* Petugas Lapangan */}
         {fieldOfficer && (
           <Card className="p-6 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Assigned Field Officer</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">Petugas Lapangan Penanggung Jawab</h3>
             <div className="flex items-center gap-4">
               {fieldOfficer.avatar_url && (
                 <img
@@ -293,24 +293,24 @@ export default function BinDetails() {
                 )}
               </div>
               <Button className="bg-green-600 hover:bg-green-700 text-white">
-                Contact Officer
+                Hubungi Petugas
               </Button>
             </div>
           </Card>
         )}
 
-        {/* Notes */}
+        {/* Catatan */}
         {bin.notes && (
           <Card className="p-6 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-2">Notes</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">Catatan</h3>
             <p className="text-gray-700">{bin.notes}</p>
           </Card>
         )}
 
-        {/* Recent Notifications */}
+        {/* Peringatan Terbaru */}
         {recentNotifications.length > 0 && (
           <Card className="p-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Recent Alerts</h3>
+            <h3 className="font-semibold text-gray-900 mb-4">Peringatan Terbaru</h3>
             <div className="space-y-3">
               {recentNotifications.map((notif) => (
                 <div

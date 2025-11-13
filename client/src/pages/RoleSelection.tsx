@@ -9,15 +9,15 @@ export default function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: s
   const roles = [
     {
       id: "public",
-      title: "Public User",
-      description: "Access public eco-bin locations and report issues",
+      title: "Pengguna Publik",
+      description: "Akses lokasi eco-bin publik dan laporkan masalah",
       icon: Users,
       color: "from-emerald-500 to-teal-600",
     },
     {
       id: "officer",
-      title: "Field Officer",
-      description: "Manage bins, monitor systems, and respond to alerts",
+      title: "Petugas Lapangan",
+      description: "Kelola bak, pantau sistem, dan tanggapi peringatan",
       icon: Shield,
       color: "from-blue-500 to-cyan-600",
     },
@@ -34,8 +34,8 @@ export default function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: s
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 p-4 flex items-center justify-center">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-3">Select Your Role</h1>
-          <p className="text-muted-foreground text-lg">Choose how you'd like to use Smecopop</p>
+          <h1 className="text-4xl font-bold text-foreground mb-3">Pilih Peran Anda</h1>
+          <p className="text-muted-foreground text-lg">Pilih cara Anda menggunakan Smecopop</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -74,7 +74,7 @@ export default function RoleSelection({ onRoleSelect }: { onRoleSelect: (role: s
             onClick={handleContinue}
             data-testid="button-continue"
           >
-            Continue
+            Lanjut
           </Button>
         </div>
       </div>

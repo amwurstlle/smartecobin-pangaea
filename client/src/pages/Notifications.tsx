@@ -10,17 +10,17 @@ export default function Notifications() {
 
   const notifications = {
     normal: [
-      { id: 1, title: "Bin A Collected", message: "Central Park Bin A has been successfully emptied", time: "2 hours ago", icon: CheckCircle },
-      { id: 2, title: "System Update", message: "New software version 2.4.1 installed", time: "5 hours ago", icon: Bell },
-      { id: 3, title: "Scheduled Maintenance", message: "Routine maintenance completed on sector 3", time: "1 day ago", icon: Bell },
+      { id: 1, title: "Bak A Dikumpulkan", message: "Bak A Central Park telah berhasil dikosongkan", time: "2 jam lalu", icon: CheckCircle },
+      { id: 2, title: "Pembaruan Sistem", message: "Perangkat lunak versi 2.4.1 telah dipasang", time: "5 jam lalu", icon: Bell },
+      { id: 3, title: "Perawatan Terjadwal", message: "Perawatan rutin selesai di sektor 3", time: "1 hari lalu", icon: Bell },
     ],
     fullAlert: [
-      { id: 4, title: "Bin B at 85%", message: "Main Street Bin B requires collection within 24 hours", time: "1 hour ago", icon: AlertTriangle },
-      { id: 5, title: "Bin E at 78%", message: "Downtown Bin E filling up faster than usual", time: "3 hours ago", icon: AlertTriangle },
+      { id: 4, title: "Bak B 85%", message: "Bak B Main Street perlu diangkut dalam 24 jam", time: "1 jam lalu", icon: AlertTriangle },
+      { id: 5, title: "Bak E 78%", message: "Bak E Downtown terisi lebih cepat dari biasanya", time: "3 jam lalu", icon: AlertTriangle },
     ],
     critical: [
-      { id: 6, title: "Bin C Critical", message: "Plaza Bin C is at 95% capacity - immediate action required", time: "30 min ago", icon: AlertCircle },
-      { id: 7, title: "Sensor Malfunction", message: "Temperature sensor offline in Park Avenue Bin D", time: "1 hour ago", icon: AlertCircle },
+      { id: 6, title: "Kritis: Bak C", message: "Bak C Plaza mencapai 95% kapasitas - butuh tindakan segera", time: "30 menit lalu", icon: AlertCircle },
+      { id: 7, title: "Sensor Bermasalah", message: "Sensor suhu offline di Bak D Park Avenue", time: "1 jam lalu", icon: AlertCircle },
     ],
   };
 
@@ -55,18 +55,18 @@ export default function Notifications() {
     <div className="min-h-screen bg-gradient-to-br from-teal-50 via-emerald-50 to-green-50 p-6 space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Notifications</h1>
-          <p className="text-muted-foreground">Stay updated on bin status and system alerts</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Notifikasi</h1>
+          <p className="text-muted-foreground">Tetap terupdate status bak dan peringatan sistem</p>
         </div>
         <Button variant="outline" className="rounded-xl" data-testid="button-mark-all-read">
-          Mark all as read
+          Tandai semua sudah dibaca
         </Button>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-4 h-12 rounded-xl">
           <TabsTrigger value="all" className="rounded-lg" data-testid="tab-all">
-            All
+            Semua
             <Badge className="ml-2 h-5 px-2" variant="secondary">
               {notifications.normal.length + notifications.fullAlert.length + notifications.critical.length - dismissedIds.length}
             </Badge>
@@ -78,13 +78,13 @@ export default function Notifications() {
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="warning" className="rounded-lg" data-testid="tab-warning">
-            Alerts
+            Peringatan
             <Badge className="ml-2 h-5 px-2 bg-amber-500 text-white">
               {notifications.fullAlert.filter((n) => !dismissedIds.includes(n.id)).length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="critical" className="rounded-lg" data-testid="tab-critical">
-            Critical
+            Kritis
             <Badge className="ml-2 h-5 px-2 bg-red-500 text-white">
               {notifications.critical.filter((n) => !dismissedIds.includes(n.id)).length}
             </Badge>

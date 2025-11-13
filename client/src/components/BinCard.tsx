@@ -49,20 +49,33 @@ export default function BinCard({ bin, onRefresh }: BinCardProps) {
     return "bg-green-500";
   };
 
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case "full":
+        return "PENUH";
+      case "warning":
+        return "PERINGATAN";
+      case "normal":
+        return "NORMAL";
+      default:
+        return status.toUpperCase();
+    }
+  };
+
   const formatTime = (timestamp: string): string => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
 
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1) return "Baru saja";
+    if (diffMins < 60) return `${diffMins} menit lalu`;
 
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return `${diffHours} jam lalu`;
 
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return `${diffDays} hari lalu`;
   };
 
   return (
@@ -80,14 +93,14 @@ export default function BinCard({ bin, onRefresh }: BinCardProps) {
           className={`whitespace-nowrap border ${getStatusColor(bin.status)}`}
           variant="outline"
         >
-          {bin.status.toUpperCase()}
+          {getStatusLabel(bin.status)}
         </Badge>
       </div>
 
-      {/* Fill Level */}
+      {/* Tingkat Kepenuhan */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-foreground">Fill Level</span>
+          <span className="text-sm font-medium text-foreground">Tingkat Kepenuhan</span>
           <span className="text-lg font-bold text-foreground">{bin.fill_level}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
@@ -100,9 +113,9 @@ export default function BinCard({ bin, onRefresh }: BinCardProps) {
         </div>
       </div>
 
-      {/* Last Updated */}
+      {/* Terakhir diperbarui */}
       <div className="text-xs text-muted-foreground border-t pt-3">
-        Last updated: {formatTime(bin.last_updated)}
+        Terakhir diperbarui: {formatTime(bin.last_updated)}
       </div>
     </Card>
   );

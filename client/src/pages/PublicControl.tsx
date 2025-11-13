@@ -9,27 +9,27 @@ export default function PublicControl() {
       location: "Jalan Sudirman No. 45",
       fillLevel: 45,
       status: "operating",
-      lastCollection: "2 hours ago",
-      nextCollection: "Tomorrow 10:00 AM",
-      type: "Organic",
+      lastCollection: "2 jam yang lalu",
+      nextCollection: "Besok 10:00",
+      type: "Organik",
     },
     {
       id: 2,
       location: "Plaza Senayan",
       fillLevel: 85,
       status: "full",
-      lastCollection: "5 hours ago",
-      nextCollection: "Today 6:00 PM",
-      type: "Inorganic",
+      lastCollection: "5 jam yang lalu",
+      nextCollection: "Hari ini 18:00",
+      type: "Inorganik",
     },
     {
       id: 3,
       location: "Taman Suropati",
       fillLevel: 30,
       status: "operating",
-      lastCollection: "12 hours ago",
-      nextCollection: "Tomorrow 2:00 PM",
-      type: "Mixed",
+      lastCollection: "12 jam yang lalu",
+      nextCollection: "Besok 14:00",
+      type: "Campuran",
     },
   ];
 
@@ -56,23 +56,23 @@ export default function PublicControl() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-6 space-y-6 pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Bin Control</h1>
-        <p className="text-muted-foreground">Monitor and manage nearby eco-bins</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Kontrol Bak</h1>
+        <p className="text-muted-foreground">Pantau dan kelola eco-bin terdekat</p>
       </div>
 
       {/* Filter & Actions */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         <Button variant="default" className="whitespace-nowrap eco-gradient">
-          All Bins
+          Semua Bak
         </Button>
         <Button variant="outline" className="whitespace-nowrap">
-          Full
+          Penuh
         </Button>
         <Button variant="outline" className="whitespace-nowrap">
-          Operating
+          Beroperasi
         </Button>
         <Button variant="outline" className="whitespace-nowrap">
-          Maintenance
+          Perawatan
         </Button>
       </div>
 
@@ -90,7 +90,7 @@ export default function PublicControl() {
                   </div>
                   <p className="text-sm text-muted-foreground flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
-                    Type: {bin.type}
+                    Jenis: {bin.type}
                   </p>
                 </div>
                 <div
@@ -99,7 +99,7 @@ export default function PublicControl() {
                   )} flex items-center gap-1`}
                 >
                   {getStatusIcon(bin.status)}
-                  {bin.status === "full" ? "Full" : "Operating"}
+                  {bin.status === "full" ? "Penuh" : "Beroperasi"}
                 </div>
               </div>
             </div>
@@ -107,7 +107,7 @@ export default function PublicControl() {
             {/* Fill Level */}
             <div className="p-4 pb-3 border-b">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-foreground">Fill Level</span>
+                <span className="text-sm font-medium text-foreground">Tingkat Kepenuhan</span>
                 <span className="text-lg font-bold text-foreground">{bin.fillLevel}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
@@ -128,14 +128,14 @@ export default function PublicControl() {
             <div className="p-4 pb-3 bg-gray-50">
               <div className="grid grid-cols-2 gap-4 mb-3">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Last Collection</p>
+                  <p className="text-xs text-muted-foreground mb-1">Pengangkutan Terakhir</p>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-blue-600" />
                     <p className="text-sm font-medium">{bin.lastCollection}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Next Collection</p>
+                  <p className="text-xs text-muted-foreground mb-1">Pengangkutan Berikutnya</p>
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-purple-600" />
                     <p className="text-sm font-medium">{bin.nextCollection}</p>
@@ -149,15 +149,15 @@ export default function PublicControl() {
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => alert(`View details for ${bin.location}`)}
+                onClick={() => alert(`Lihat detail untuk ${bin.location}`)}
               >
-                View Details
+                Lihat Detail
               </Button>
               <Button
                 variant="outline"
                 size="icon"
                 className="hover:bg-blue-50"
-                onClick={() => alert(`Call field officer for ${bin.location}`)}
+                onClick={() => alert(`Hubungi petugas lapangan untuk ${bin.location}`)}
               >
                 <Phone className="w-4 h-4 text-blue-600" />
               </Button>
@@ -171,9 +171,9 @@ export default function PublicControl() {
         <div className="flex gap-3">
           <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-amber-900">Alert!</p>
+            <p className="font-semibold text-amber-900">Peringatan!</p>
             <p className="text-sm text-amber-800">
-              1 bin is nearly full. Your field officer has been notified and will collect it soon.
+              1 bak hampir penuh. Petugas lapangan Anda telah diberi tahu dan akan segera mengangkutnya.
             </p>
           </div>
         </div>

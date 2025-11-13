@@ -152,7 +152,7 @@ export default function SmartMonitoring() {
         },
         (error) => {
           console.error("Geolocation error:", error);
-          alert("Unable to get your location. Please enable location services.");
+          alert("Tidak dapat mendapatkan lokasi Anda. Mohon aktifkan layanan lokasi.");
         }
       );
     }
@@ -204,15 +204,15 @@ export default function SmartMonitoring() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Smart Trash Monitoring</h1>
-          <p className="text-gray-600">Real-time trash bin status and alerts</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Pemantauan Sampah Pintar</h1>
+          <p className="text-gray-600">Status bak dan peringatan real-time</p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
           <Card className="p-4 bg-blue-50 border-blue-200">
             <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
-            <p className="text-xs text-gray-600">Total Bins</p>
+            <p className="text-xs text-gray-600">Total Bak</p>
           </Card>
           <Card className="p-4 bg-green-50 border-green-200">
             <div className="text-2xl font-bold text-green-600">{stats.normal}</div>
@@ -220,15 +220,15 @@ export default function SmartMonitoring() {
           </Card>
           <Card className="p-4 bg-yellow-50 border-yellow-200">
             <div className="text-2xl font-bold text-yellow-600">{stats.warning}</div>
-            <p className="text-xs text-gray-600">Warning</p>
+            <p className="text-xs text-gray-600">Peringatan</p>
           </Card>
           <Card className="p-4 bg-red-50 border-red-200">
             <div className="text-2xl font-bold text-red-600">{stats.full}</div>
-            <p className="text-xs text-gray-600">Full</p>
+            <p className="text-xs text-gray-600">Penuh</p>
           </Card>
           <Card className="p-4 bg-purple-50 border-purple-200">
             <div className="text-2xl font-bold text-purple-600">{unreadCount}</div>
-            <p className="text-xs text-gray-600">Alerts</p>
+            <p className="text-xs text-gray-600">Peringatan</p>
           </Card>
         </div>
 
@@ -239,7 +239,7 @@ export default function SmartMonitoring() {
               <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
               <Input
                 type="text"
-                placeholder="Search bins by name or location..."
+                placeholder="Cari bak berdasarkan nama atau lokasi..."
                 value={searchQuery}
                 onChange={handleSearch}
                 className="pl-10"
@@ -251,13 +251,13 @@ export default function SmartMonitoring() {
               className="gap-2"
             >
               {viewMode === "list" ? <Map className="w-4 h-4" /> : <List className="w-4 h-4" />}
-              {viewMode === "list" ? "Map" : "List"}
+              {viewMode === "list" ? "Peta" : "Daftar"}
             </Button>
             <Button onClick={handleGetNearby} variant="outline" className="gap-2">
-              <Locate className="w-4 h-4" /> Nearby
+              <Locate className="w-4 h-4" /> Terdekat
             </Button>
             <Button onClick={fetchBins} variant="outline" className="gap-2">
-              <RefreshCw className="w-4 h-4" /> Refresh
+              <RefreshCw className="w-4 h-4" /> Muat Ulang
             </Button>
           </div>
 
@@ -278,7 +278,7 @@ export default function SmartMonitoring() {
                     : ""
                 }`}
               >
-                {status}
+                {status === "normal" ? "Normal" : status === "warning" ? "Peringatan" : "Penuh"}
               </Button>
             ))}
           </div>
@@ -300,7 +300,7 @@ export default function SmartMonitoring() {
                   </div>
                 ) : filteredBins.length === 0 ? (
                   <Card className="p-8 text-center">
-                    <p className="text-gray-600">No bins found</p>
+                    <p className="text-gray-600">Tidak ada bak ditemukan</p>
                   </Card>
                 ) : (
                   filteredBins.map((bin) => (
@@ -333,7 +333,7 @@ export default function SmartMonitoring() {
                       </div>
                       {bin.distance !== undefined && (
                         <p className="text-xs text-gray-500 mt-2">
-                          {bin.distance.toFixed(1)} km away
+                          {bin.distance.toFixed(1)} km dari sini
                         </p>
                       )}
                     </Card>
@@ -362,12 +362,12 @@ export default function SmartMonitoring() {
                           <div>
                             <p className="font-semibold">{bin.name}</p>
                             <p className="text-sm">{bin.location}</p>
-                            <p className="text-sm">Fill: {bin.fill_level}%</p>
+                            <p className="text-sm">Kepenuhan: {bin.fill_level}%</p>
                             <Button
                               onClick={() => navigate(`/bins/${bin.id}`)}
                               className="mt-2 w-full text-xs h-7"
                             >
-                              View Details
+                              Lihat Detail
                             </Button>
                           </div>
                         </Popup>
@@ -376,7 +376,7 @@ export default function SmartMonitoring() {
                   )}
                   {userLocation && (
                     <Marker position={userLocation} icon={L.icon({ iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png", iconSize: [32, 32] })}>
-                      <Popup>Your Location</Popup>
+                      <Popup>Lokasi Anda</Popup>
                     </Marker>
                   )}
                 </MapContainer>
@@ -390,7 +390,7 @@ export default function SmartMonitoring() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                   <Bell className="w-5 h-5" />
-                  Alerts
+                  Peringatan
                 </h2>
                 {unreadCount > 0 && (
                   <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">

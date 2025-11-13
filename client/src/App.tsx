@@ -8,7 +8,6 @@ import LoginPage from "./pages/LoginPage";
 import RoleSelection from "./pages/RoleSelection";
 import Dashboard from "./pages/Dashboard";
 import TrashMonitoring from "./pages/TrashMonitoring";
-import ControlCompartment from "./pages/ControlCompartment";
 import Notifications from "./pages/Notifications";
 import UserProfile from "./pages/UserProfile";
 import PublicHome from "./pages/PublicHome";
@@ -26,12 +25,20 @@ function Router() {
 
   // Check for existing token/user on mount
   useEffect(() => {
+    // If previously auto-filled dev token exists, clear it to show the login form
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
-    if (token && user) {
+    if (token === "dev-bypass") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
+
+    const freshToken = localStorage.getItem("token");
+    const freshUser = localStorage.getItem("user");
+    if (freshToken && freshUser) {
       setIsAuthenticated(true);
       try {
-        const userData = JSON.parse(user);
+        const userData = JSON.parse(freshUser);
         setSelectedRole(userData.role);
       } catch (e) {
         console.error("Failed to parse user data");
@@ -59,6 +66,7 @@ function Router() {
   };
 
   const handleLogout = () => {
+    if (!window.confirm("Apakah Anda yakin ingin keluar?")) return;
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setIsAuthenticated(false);
@@ -70,7 +78,7 @@ function Router() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full border-4 border-green-300 border-t-green-600 animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">Memuat...</p>
         </div>
       </div>
     );
@@ -81,14 +89,14 @@ function Router() {
   }
 
   return (
-    <Routes>
+    <>
+      <Routes>
       {!selectedRole ? (
         <Route path="*" element={<RoleSelection onRoleSelect={handleRoleSelect} />} />
       ) : selectedRole === "public" ? (
         <>
           <Route path="/" element={<PublicHome />} />
           <Route path="/home" element={<PublicHome />} />
-          <Route path="/control" element={<PublicControl />} />
           <Route path="/monitor" element={<PublicMonitor />} />
           <Route path="/bins/:id" element={<BinDetails />} />
           <Route path="/profile" element={<UserProfile onLogout={handleLogout} />} />
@@ -100,14 +108,15 @@ function Router() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/monitoring" element={<TrashMonitoring />} />
           <Route path="/smart-monitoring" element={<SmartMonitoring />} />
-          <Route path="/control" element={<ControlCompartment />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/bins/:id" element={<BinDetails />} />
           <Route path="/profile" element={<UserProfile onLogout={handleLogout} />} />
           <Route path="*" element={<NotFound />} />
         </>
       )}
-    </Routes>
+      </Routes>
+      <BottomNav />
+    </>
   );
 }
 

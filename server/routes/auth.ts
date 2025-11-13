@@ -152,6 +152,33 @@ authRouter.post(
         });
       }
 
+      // Development bypass: if DEV_BYPASS_AUTH is set to 1 or true, skip DB checks
+      const devBypass = process.env.DEV_BYPASS_AUTH === "1" || process.env.DEV_BYPASS_AUTH === "true";
+      if (devBypass) {
+        // Return a fake user and JWT so the frontend can continue without a DB
+        const fakeUser = {
+          id: "dev-user-1",
+          name: "Developer",
+          email,
+          phone: null,
+          role: "admin",
+          avatar_url: null,
+        };
+
+        const token = createToken({
+          id: fakeUser.id,
+          email: fakeUser.email,
+          name: fakeUser.name,
+          role: fakeUser.role,
+        });
+
+        return res.status(200).json({
+          message: "Dev bypass login",
+          token,
+          user: fakeUser,
+        });
+      }
+
       const supabase = getSupabase();
 
       // Get user by email

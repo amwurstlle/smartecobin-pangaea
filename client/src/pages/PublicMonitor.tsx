@@ -37,26 +37,26 @@ export default function PublicMonitor() {
     {
       id: 1,
       location: "Jalan Sudirman No. 45",
-      issue: "Bin is full",
+      issue: "Bak penuh",
       severity: "high",
-      reported: "2 hours ago",
-      status: "In Progress",
+      reported: "2 jam lalu",
+      status: "Dalam Proses",
     },
     {
       id: 2,
       location: "Plaza Senayan",
-      issue: "Sensor malfunction",
+      issue: "Sensor bermasalah",
       severity: "medium",
-      reported: "4 hours ago",
-      status: "Pending",
+      reported: "4 jam lalu",
+      status: "Tertunda",
     },
     {
       id: 3,
       location: "Taman Suropati",
-      issue: "Lid stuck",
+      issue: "Tutup macet",
       severity: "low",
-      reported: "6 hours ago",
-      status: "Scheduled",
+      reported: "6 jam lalu",
+      status: "Dijadwalkan",
     },
   ];
 
@@ -77,8 +77,8 @@ export default function PublicMonitor() {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-6 space-y-6 pb-24">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Monitoring</h1>
-        <p className="text-muted-foreground">Track your area's eco-bin performance</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Pemantauan</h1>
+        <p className="text-muted-foreground">Lacak performa eco-bin di wilayah Anda</p>
       </div>
 
       {/* Overview Stats */}
@@ -89,7 +89,7 @@ export default function PublicMonitor() {
             <TrendingUp className="w-4 h-4 text-green-600" />
           </div>
           <div className="text-2xl font-bold text-foreground">345</div>
-          <div className="text-xs text-muted-foreground">Total Bins Monitored</div>
+          <div className="text-xs text-muted-foreground">Total Bak Dipantau</div>
         </Card>
 
         <Card className="p-4">
@@ -98,7 +98,7 @@ export default function PublicMonitor() {
             <TrendingUp className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-2xl font-bold text-foreground">13</div>
-          <div className="text-xs text-muted-foreground">Active Alerts</div>
+          <div className="text-xs text-muted-foreground">Peringatan Aktif</div>
         </Card>
 
         <Card className="p-4">
@@ -107,7 +107,7 @@ export default function PublicMonitor() {
             <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
           <div className="text-2xl font-bold text-foreground">89%</div>
-          <div className="text-xs text-muted-foreground">Collection Rate</div>
+          <div className="text-xs text-muted-foreground">Tingkat Pengangkutan</div>
         </Card>
 
         <Card className="p-4">
@@ -116,13 +116,13 @@ export default function PublicMonitor() {
             <TrendingUp className="w-4 h-4 text-blue-600" />
           </div>
           <div className="text-2xl font-bold text-foreground">12.5t</div>
-          <div className="text-xs text-muted-foreground">Collected Today</div>
+          <div className="text-xs text-muted-foreground">Terkumpul Hari Ini</div>
         </Card>
       </div>
 
       {/* Areas Performance */}
       <Card className="p-6">
-        <h2 className="text-xl font-bold text-foreground mb-4">Area Performance</h2>
+  <h2 className="text-xl font-bold text-foreground mb-4">Performa Area</h2>
         <div className="space-y-4">
           {monitoringData.map((area, index) => (
             <div key={index} className="p-4 bg-gray-50 rounded-lg border">
@@ -131,7 +131,7 @@ export default function PublicMonitor() {
                   <MapPin className="w-5 h-5 text-emerald-600" />
                   <div>
                     <h3 className="font-bold text-foreground">{area.area}</h3>
-                    <p className="text-xs text-muted-foreground">{area.binsTotal} bins total</p>
+                    <p className="text-xs text-muted-foreground">{area.binsTotal} total bak</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -145,15 +145,15 @@ export default function PublicMonitor() {
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <div className="bg-green-100 text-green-700 px-3 py-2 rounded text-center">
                   <div className="font-bold">{area.binsClean}</div>
-                  <div className="text-xs">Clean</div>
+                  <div className="text-xs">Bersih</div>
                 </div>
                 <div className="bg-amber-100 text-amber-700 px-3 py-2 rounded text-center">
                   <div className="font-bold">{area.binsFull}</div>
-                  <div className="text-xs">Full</div>
+                  <div className="text-xs">Penuh</div>
                 </div>
                 <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded text-center">
                   <div className="font-bold">{area.binsUnderMaintenance}</div>
-                  <div className="text-xs">Maintenance</div>
+                  <div className="text-xs">Perawatan</div>
                 </div>
               </div>
             </div>
@@ -163,7 +163,7 @@ export default function PublicMonitor() {
 
       {/* Active Issues */}
       <Card className="p-6">
-        <h2 className="text-xl font-bold text-foreground mb-4">Active Issues</h2>
+  <h2 className="text-xl font-bold text-foreground mb-4">Permasalahan Aktif</h2>
         <div className="space-y-3">
           {issues.map((issue) => (
             <div key={issue.id} className="p-4 bg-gray-50 rounded-lg border hover:bg-gray-100 transition-colors">
@@ -186,7 +186,7 @@ export default function PublicMonitor() {
                   <p className="text-xs font-semibold text-blue-600 mb-2">{issue.status}</p>
                   <Button size="sm" variant="outline" className="text-xs h-7">
                     <Phone className="w-3 h-3 mr-1" />
-                    Call
+                    Telepon
                   </Button>
                 </div>
               </div>
@@ -197,13 +197,13 @@ export default function PublicMonitor() {
 
       {/* Quick Contact */}
       <Card className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-        <h2 className="text-lg font-bold text-foreground mb-3">Need Help?</h2>
+        <h2 className="text-lg font-bold text-foreground mb-3">Butuh Bantuan?</h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Contact your field officer for immediate assistance
+          Hubungi petugas lapangan untuk bantuan segera
         </p>
         <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
           <Phone className="w-4 h-4 mr-2" />
-          Call Field Officer
+          Telepon Petugas
         </Button>
       </Card>
     </div>

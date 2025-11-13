@@ -50,6 +50,18 @@ export function authenticateToken(
   res: any,
   next: any
 ): void {
+  // Development bypass: allow all requests and inject a fake user if enabled
+  const devBypass = process.env.DEV_BYPASS_AUTH === "1" || process.env.DEV_BYPASS_AUTH === "true";
+  if (devBypass) {
+    req.user = req.user || {
+      id: "dev-user-1",
+      email: "dev@example.com",
+      name: "Developer",
+      role: "admin",
+    };
+    return next();
+  }
+
   const authHeader = req.headers.authorization;
   const token = extractTokenFromHeader(authHeader);
 
