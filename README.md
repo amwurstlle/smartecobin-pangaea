@@ -406,11 +406,38 @@ Phone: optional
 
 ---
 
+## ☁️ Deploy ke Vercel (Production)
+
+- Pastikan env vars diset di Vercel Project Settings → Environment Variables:
+  - `SUPABASE_URL`
+  - `SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `JWT_SECRET`
+
+- Konfigurasi deploy (sudah disiapkan):
+  - `vercel.json` menjalankan `npm run vercel-build` untuk build client ke `dist/public` (lihat `vite.config.ts`).
+  - Semua request `/api/*` diarahkan ke fungsi serverless `api/index.ts` (Express adapter).
+  - Fallback SPA: semua route non-API diarahkan ke `/dist/public/index.html`.
+
+- Deploy via CLI (Windows PowerShell):
+
+```powershell
+
+---
+
 ## 🌟 KEY FEATURES IMPLEMENTED
+
+- Verifikasi lokal (opsional):
+
+```powershell
 
 ✨ **User Authentication**
 - Secure register/login dengan bcrypt
 - JWT tokens dengan expiry
+
+Catatan:
+- Di production, client otomatis pakai same-origin API; tidak perlu CORS khusus.
+- Di development, jika client jalan di `:5173`, otomatis target API `:5001`.
 - Role-based access control
 
 ✨ **Real-time Monitoring**
