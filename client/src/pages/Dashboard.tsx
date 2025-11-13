@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, Trash2, CheckCircle, Leaf, Recycle } from "lucide-react";
+import { TrendingUp, Trash2, CheckCircle, Recycle } from "lucide-react";
+import { API_URL } from "@/lib/api";
 
 export default function Dashboard() {
   const stats = [
@@ -20,11 +21,6 @@ export default function Dashboard() {
     { day: "Jum", volume: 92 },
     { day: "Sab", volume: 70 },
     { day: "Min", volume: 55 },
-  ];
-
-  const categories = [
-    { name: "Organik", percentage: 45, icon: Leaf, color: "bg-green-600" },
-    { name: "Inorganik", percentage: 55, icon: Recycle, color: "bg-blue-500" },
   ];
 
   const maxVolume = Math.max(...trashData.map((d) => d.volume));
@@ -70,7 +66,25 @@ export default function Dashboard() {
           <div className="text-2xl font-bold text-foreground mb-3">Kosongkan Bak</div>
           <Button
             className="w-full h-10 rounded-xl"
-            onClick={() => console.log("empty bin triggered")}
+            onClick={async () => {
+              const token = localStorage.getItem("token");
+              try {
+                const resp = await fetch(`${API_URL}/api/actions/empty`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+                  body: JSON.stringify({ notes: 'Kosongkan Bak dari Dashboard' })
+                });
+                if (!resp.ok) {
+                  const data = await resp.json().catch(() => ({}));
+                  const msg = data.error || data.details || 'Gagal merekam aksi.';
+                  alert(msg);
+                } else {
+                  alert('Aksi dikirim. Histori diperbarui.');
+                }
+              } catch (e) {
+                alert(e instanceof Error ? e.message : String(e));
+              }
+            }}
             data-testid="button-empty-bin"
           >
             Kosongkan
@@ -110,30 +124,7 @@ export default function Dashboard() {
         </div>
       </Card>
 
-      <Card className="p-6">
-        <h2 className="text-xl font-bold text-foreground mb-6">Kategori Sampah</h2>
-        <div className="space-y-6">
-          {categories.map((category, index) => {
-            const Icon = category.icon;
-            return (
-              <div key={index} className="space-y-3" data-testid={`category-${index}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-3 rounded-xl ${category.color}`}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <span className="font-semibold text-foreground text-lg">{category.name}</span>
-                  </div>
-                  <span className="text-xl font-bold text-foreground">{category.percentage}%</span>
-                </div>
-                <div className="h-3 bg-secondary rounded-full overflow-hidden">
-                  <div className={`h-full ${category.color} rounded-full transition-all duration-500`} style={{ width: `${category.percentage}%` }}></div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+      {/* Removed Kategori Sampah section as requested */}
     </div>
   );
 }

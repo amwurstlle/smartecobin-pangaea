@@ -27,7 +27,7 @@ export default function BottomNav() {
   const officerNavItems = [
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/monitoring", icon: Map, label: "Pantau" },
-    { path: "/notifications", icon: Bell, label: "Notifikasi" },
+    { path: "/notifications", icon: Bell, label: "Histori" },
     { path: "/profile", icon: User, label: "Profil" },
   ];
 

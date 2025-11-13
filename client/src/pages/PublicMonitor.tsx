@@ -5,7 +5,7 @@ import { MapPin, AlertTriangle, CheckCircle, TrendingUp, Leaf, Recycle, Phone } 
 export default function PublicMonitor() {
   const monitoringData = [
     {
-      area: "Jakarta Pusat",
+      area: "Semarang Tengah",
       binsTotal: 45,
       binsClean: 38,
       binsFull: 5,
@@ -14,7 +14,7 @@ export default function PublicMonitor() {
       trend: "+5%",
     },
     {
-      area: "Jakarta Selatan",
+      area: "Semarang Selatan",
       binsTotal: 52,
       binsClean: 45,
       binsFull: 4,
@@ -23,7 +23,7 @@ export default function PublicMonitor() {
       trend: "+2%",
     },
     {
-      area: "Jakarta Timur",
+      area: "Semarang Timur",
       binsTotal: 38,
       binsClean: 32,
       binsFull: 4,
@@ -36,7 +36,7 @@ export default function PublicMonitor() {
   const issues = [
     {
       id: 1,
-      location: "Jalan Sudirman No. 45",
+      location: "Jl. Pandanaran",
       issue: "Bak penuh",
       severity: "high",
       reported: "2 jam lalu",
@@ -44,7 +44,7 @@ export default function PublicMonitor() {
     },
     {
       id: 2,
-      location: "Plaza Senayan",
+      location: "Simpang Lima",
       issue: "Sensor bermasalah",
       severity: "medium",
       reported: "4 jam lalu",
@@ -52,7 +52,7 @@ export default function PublicMonitor() {
     },
     {
       id: 3,
-      location: "Taman Suropati",
+      location: "Kota Lama",
       issue: "Tutup macet",
       severity: "low",
       reported: "6 jam lalu",

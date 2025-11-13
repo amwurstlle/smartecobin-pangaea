@@ -8,8 +8,9 @@ import { RefreshCw, Bell, Search, Map, List, Locate } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import { API_URL } from "@/lib/api";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+// Use shared API base URL
 
 interface TrashBin {
   id: string;
@@ -61,7 +62,8 @@ export default function SmartMonitoring() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
-  const [mapCenter, setMapCenter] = useState<[number, number]>([-6.2088, 106.8456]);
+  // Default peta ke Semarang, Indonesia
+  const [mapCenter, setMapCenter] = useState<[number, number]>([-6.9932, 110.4203]);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   // Fetch bins using new API

@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Leaf, AlertCircle } from "lucide-react";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+import { API_URL } from "@/lib/api";
 
 export default function LoginPage({ onLogin }: { onLogin: () => void }) {
   const navigate = useNavigate();
@@ -247,9 +246,6 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
             disabled={loading || (isRegister && cooldown > 0)}
             className="w-full h-10 sm:h-12 rounded-xl bg-white text-primary font-semibold hover:bg-white/90 transition-all disabled:opacity-50"
           >
-<<<<<<< HEAD
-            {loading ? "Memuat..." : isRegister ? "Buat Akun" : "Masuk"}
-=======
             {loading
               ? "Loading..."
               : isRegister
@@ -257,7 +253,6 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
                   ? `Create Account (wait ${cooldown}s)`
                   : "Create Account"
                 : "Sign In"}
->>>>>>> 92e1ac3eafb36fc47393390fbfebaf9e050c46a5
           </Button>
         </form>
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { CheckCircle } from "lucide-react";
 import { API_URL } from "@/lib/api";
 
@@ -14,8 +14,7 @@ type ActionItem = {
   trash_bins?: { id: string; name: string; location?: string | null } | null;
 }
 
-
-export default function Notifications() {
+export default function History() {
   const [items, setItems] = useState<ActionItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +29,7 @@ export default function Notifications() {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
         });
         const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || data.details || 'Gagal memuat histori');
+        if (!resp.ok) throw new Error(data.error || 'Gagal memuat histori');
         setItems(data.history || []);
       } catch (e: any) {
         setError(e.message || String(e));

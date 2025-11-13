@@ -6,14 +6,14 @@ export default function PublicHome() {
   const fieldOfficer = {
     name: "Ahmad Santoso",
     phone: "+62 812-3456-7890",
-    area: "Jakarta Pusat",
+    area: "Semarang, Jawa Tengah",
     status: "Tersedia",
   };
 
   const recentBins = [
-    { location: "Jalan Sudirman No. 45", status: "Clean", distance: "0.5 km" },
-    { location: "Plaza Senayan", status: "Medium", distance: "1.2 km" },
-    { location: "Taman Suropati", status: "Clean", distance: "0.8 km" },
+    { location: "Simpang Lima", status: "Clean", distance: "0.5 km" },
+    { location: "Tugu Muda", status: "Medium", distance: "1.2 km" },
+    { location: "Kota Lama", status: "Clean", distance: "0.8 km" },
   ];
 
   return (

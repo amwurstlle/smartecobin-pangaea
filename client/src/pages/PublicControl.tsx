@@ -6,7 +6,7 @@ export default function PublicControl() {
   const bins = [
     {
       id: 1,
-      location: "Jalan Sudirman No. 45",
+      location: "Jl. Gajah Mada",
       fillLevel: 45,
       status: "operating",
       lastCollection: "2 jam yang lalu",
@@ -15,7 +15,7 @@ export default function PublicControl() {
     },
     {
       id: 2,
-      location: "Plaza Senayan",
+      location: "Simpang Lima",
       fillLevel: 85,
       status: "full",
       lastCollection: "5 jam yang lalu",
@@ -24,7 +24,7 @@ export default function PublicControl() {
     },
     {
       id: 3,
-      location: "Taman Suropati",
+      location: "Taman Indonesia Kaya",
       fillLevel: 30,
       status: "operating",
       lastCollection: "12 jam yang lalu",

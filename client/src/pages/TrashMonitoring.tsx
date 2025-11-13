@@ -11,11 +11,11 @@ export default function TrashMonitoring() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
   const bins = [
-    { id: 1, name: "Central Park Bin A", lat: 40.7829, lng: -73.9654, status: "normal", fill: 45, type: "Daur Ulang" },
-    { id: 2, name: "Main Street Bin B", lat: 40.7589, lng: -73.9851, status: "warning", fill: 82, type: "Sampah Umum" },
-    { id: 3, name: "Plaza Bin C", lat: 40.7614, lng: -73.9776, status: "critical", fill: 95, type: "Organik" },
-    { id: 4, name: "Park Avenue Bin D", lat: 40.7580, lng: -73.9855, status: "normal", fill: 28, type: "Daur Ulang" },
-    { id: 5, name: "Downtown Bin E", lat: 40.7489, lng: -73.9680, status: "warning", fill: 78, type: "Sampah Umum" },
+    { id: 1, name: "Bin Simpang Lima", lat: -6.9932, lng: 110.4203, status: "normal", fill: 45, type: "Daur Ulang" },
+    { id: 2, name: "Bin Tugu Muda", lat: -6.9822, lng: 110.4107, status: "warning", fill: 82, type: "Sampah Umum" },
+    { id: 3, name: "Bin Kota Lama", lat: -6.9713, lng: 110.4287, status: "critical", fill: 95, type: "Organik" },
+    { id: 4, name: "Bin Pandanaran", lat: -6.9886, lng: 110.4167, status: "normal", fill: 28, type: "Daur Ulang" },
+    { id: 5, name: "Bin Taman Indonesia Kaya", lat: -6.9905, lng: 110.4227, status: "warning", fill: 78, type: "Sampah Umum" },
   ];
 
   const getStatusColor = (status: string) => {
@@ -47,7 +47,8 @@ export default function TrashMonitoring() {
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    const map = L.map(mapContainerRef.current).setView([40.7614, -73.9776], 13);
+    // Pusatkan peta ke Semarang
+    const map = L.map(mapContainerRef.current).setView([-6.9932, 110.4203], 13);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
