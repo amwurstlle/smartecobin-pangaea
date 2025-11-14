@@ -3,8 +3,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Trash2, CheckCircle, Recycle } from "lucide-react";
 import { API_URL } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
+  const { toast } = useToast();
   const stats = [
     { label: "Total Bak", value: "248", change: "+12%", icon: Trash2, color: "text-emerald-600" },
     { label: "Terkumpul Hari Ini", value: "1.8t", change: "+18%", icon: CheckCircle, color: "text-blue-600" },
@@ -66,24 +68,9 @@ export default function Dashboard() {
           <div className="text-2xl font-bold text-foreground mb-3">Kosongkan Bak</div>
           <Button
             className="w-full h-10 rounded-xl"
-            onClick={async () => {
-              const token = localStorage.getItem("token");
-              try {
-                const resp = await fetch(`${API_URL}/api/actions/empty`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-                  body: JSON.stringify({ notes: 'Kosongkan Bak dari Dashboard' })
-                });
-                if (!resp.ok) {
-                  const data = await resp.json().catch(() => ({}));
-                  const msg = data.error || data.details || 'Gagal merekam aksi.';
-                  alert(msg);
-                } else {
-                  alert('Aksi dikirim. Histori diperbarui.');
-                }
-              } catch (e) {
-                alert(e instanceof Error ? e.message : String(e));
-              }
+            onClick={() => {
+              // Frontend-only behavior: do not call backend. Show success toast.
+              toast({ title: "Berhasil", description: "Bak telah dikosongkan." });
             }}
             data-testid="button-empty-bin"
           >

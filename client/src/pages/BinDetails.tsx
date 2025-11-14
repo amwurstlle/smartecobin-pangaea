@@ -79,14 +79,19 @@ export default function BinDetails() {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
+        const text = await response.text().catch(() => "");
+        let data: any = null;
+        try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+
         if (!response.ok) {
-          throw new Error("Gagal mengambil detail bak");
+          const msg = data?.error || (text && !text.trim().startsWith("<") ? text : "Gagal mengambil detail bak");
+          throw new Error(msg);
         }
 
-        const data: BinDetailsResponse = await response.json();
+        const typed: BinDetailsResponse = data;
         setBin(data.bin);
-        setFieldOfficer(data.bin.fieldOfficer);
-        setRecentNotifications(data.bin.recentNotifications);
+        setFieldOfficer(typed.bin.fieldOfficer);
+        setRecentNotifications(typed.bin.recentNotifications);
       } catch (err) {
   setError(err instanceof Error ? err.message : "Terjadi kesalahan");
       } finally {

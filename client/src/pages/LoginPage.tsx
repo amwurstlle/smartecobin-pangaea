@@ -30,6 +30,41 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
     setInfo("");
     setLoading(true);
 
+    // Client-side dev bypass: when VITE_DEV_BYPASS_AUTH is set, accept any credentials
+    const devLocal =
+      (import.meta.env.VITE_DEV_BYPASS_AUTH as unknown as string) === "1" ||
+      (import.meta.env.VITE_DEV_BYPASS_AUTH as unknown as string) === "true";
+
+    if (devLocal) {
+      try {
+        const fakeUser = {
+          id: "dev-user-1",
+          name: "Developer",
+          email,
+          phone: null,
+          role: "admin",
+          avatar_url: null,
+        } as const;
+
+        // Simple fake token (not sensitive) so app flows work
+        const fakeToken = `dev-token-${btoa(email + ":" + password)}`;
+
+        // Simulate small delay to keep UX similar to network
+        setTimeout(() => {
+          localStorage.setItem("token", fakeToken);
+          localStorage.setItem("user", JSON.stringify(fakeUser));
+          onLogin();
+          navigate("/dashboard");
+          setLoading(false);
+        }, 150);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Terjadi kesalahan saat login dev");
+        setLoading(false);
+      }
+
+      return;
+    }
+
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
@@ -37,21 +72,28 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const text = await response.text().catch(() => "");
+      let data: any = null;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        setError(data.error || "Gagal masuk");
+        const msg = data?.error || data?.message || (text && !text.trim().startsWith("<") ? text : "Gagal masuk");
+        setError(msg);
         return;
       }
 
       // Store token
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data?.token);
+      localStorage.setItem("user", JSON.stringify(data?.user));
 
       onLogin();
       navigate("/dashboard");
     } catch (err) {
-  setError(err instanceof Error ? err.message : "Terjadi kesalahan");
+      setError(err instanceof Error ? err.message : "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }
@@ -62,6 +104,38 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
     setError("");
     setInfo("");
     setLoading(true);
+    // Client-side dev bypass: when VITE_DEV_BYPASS_AUTH is set, accept any registration
+    const devLocal =
+      (import.meta.env.VITE_DEV_BYPASS_AUTH as unknown as string) === "1" ||
+      (import.meta.env.VITE_DEV_BYPASS_AUTH as unknown as string) === "true";
+
+    if (devLocal) {
+      try {
+        const fakeUser = {
+          id: `dev-user-${Date.now()}`,
+          name: name || email.split("@")[0] || "User",
+          email,
+          phone: phone || null,
+          role: "public",
+          avatar_url: null,
+        } as const;
+
+        const fakeToken = `dev-token-${btoa(email + ":" + password)}`;
+
+        setTimeout(() => {
+          localStorage.setItem("token", fakeToken);
+          localStorage.setItem("user", JSON.stringify(fakeUser));
+          onLogin();
+          navigate("/dashboard");
+          setLoading(false);
+        }, 150);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Terjadi kesalahan saat membuat akun (dev)");
+        setLoading(false);
+      }
+
+      return;
+    }
 
     try {
       if (password.length < 6) {
@@ -76,10 +150,16 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
         body: JSON.stringify({ name, email, password, phone: phone || undefined }),
       });
 
-      const data = await response.json();
+      const text = await response.text().catch(() => "");
+      let data: any = null;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = null;
+      }
 
       if (!response.ok) {
-        setError(data.error || "Pendaftaran gagal");
+        setError(data?.error || data?.message || (text && !text.trim().startsWith("<") ? text : "Pendaftaran gagal"));
         return;
       }
 
@@ -142,11 +222,17 @@ export default function LoginPage({ onLogin }: { onLogin: () => void }) {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email }),
                       });
-                      const data = await resp.json();
+                      const text2 = await resp.text().catch(() => "");
+                      let data: any = null;
+                      try {
+                        data = text2 ? JSON.parse(text2) : null;
+                      } catch {
+                        data = null;
+                      }
                       if (!resp.ok) {
-                        setError(data.error || 'Failed to resend');
+                        setError(data?.error || data?.message || (text2 && !text2.trim().startsWith("<") ? text2 : 'Failed to resend'));
                       } else {
-                        setInfo(data.message || 'Email konfirmasi dikirim ulang.');
+                        setInfo(data?.message || 'Email konfirmasi dikirim ulang.');
                         setResendCooldown(12);
                         const rt = setInterval(() => {
                           setResendCooldown((c) => {
