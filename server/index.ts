@@ -9,7 +9,7 @@ if (!process.env.NODE_ENV) {
 }
 
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import { registerRoutes } from "./appRoutes";
 import { setupVite, serveStatic, log } from "./vite";
 
 // Diagnostic handlers to surface otherwise hidden runtime errors

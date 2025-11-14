@@ -1,6 +1,6 @@
 // Vercel Serverless entry: wraps our Express app without server.listen
 import express, { type Express, type Request, type Response, type NextFunction } from 'express';
-import { registerRoutes } from '../server/routes';
+import { registerRoutes } from '../server/appRoutes';
 
 let cachedApp: Express | null = null;
 
