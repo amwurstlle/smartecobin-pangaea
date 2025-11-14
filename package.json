@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-"scripts": {
+  "scripts": {
   "dev": "cross-env DEV_PORT=5001 DEV_BYPASS_AUTH=1 VITE_DEV_BYPASS_AUTH=1 tsx server/index.ts",
     "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "vercel-build": "vite build",
@@ -15,7 +15,7 @@
   "db:migrate": "tsx scripts/run-migrations.ts",
   "db:update-passwords": "tsx scripts/update-sample-passwords.ts",
   "db:relax-password-hash": "tsx scripts/relax-password-hash.ts",
-  "client": "vite",
+  "client": "cross-env VITE_DEV_BYPASS_AUTH=1 vite",
   "client:3000": "vite --port 3000",
   "auth:seed-samples": "tsx scripts/create-sample-auth-users.ts"
 },

@@ -27,23 +27,28 @@ function Router() {
 
   // Check for existing token/user on mount
   useEffect(() => {
-    // If previously auto-filled dev token exists, clear it to show the login form
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
-    if (token === "dev-bypass") {
+    // If running in dev-bypass mode, always clear stored token/user so
+    // the login (and create-account) form appears fresh on each run.
+    const devLocal =
+      (import.meta.env.VITE_DEV_BYPASS_AUTH as unknown as string) === "1" ||
+      (import.meta.env.VITE_DEV_BYPASS_AUTH as unknown as string) === "true";
+
+    if (devLocal) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-    }
-
-    const freshToken = localStorage.getItem("token");
-    const freshUser = localStorage.getItem("user");
-    if (freshToken && freshUser) {
-      setIsAuthenticated(true);
-      try {
-        const userData = JSON.parse(freshUser);
-        setSelectedRole(userData.role);
-      } catch (e) {
-        console.error("Failed to parse user data");
+      setIsAuthenticated(false);
+      setSelectedRole(null);
+    } else {
+      const freshToken = localStorage.getItem("token");
+      const freshUser = localStorage.getItem("user");
+      if (freshToken && freshUser) {
+        setIsAuthenticated(true);
+        try {
+          const userData = JSON.parse(freshUser);
+          setSelectedRole(userData.role);
+        } catch (e) {
+          console.error("Failed to parse user data");
+        }
       }
     }
     setLoading(false);

@@ -385,6 +385,23 @@ authRouter.get("/me", authenticateToken, async (req: any, res: Response) => {
         error: "Unauthorized",
       });
     }
+    // If development bypass is enabled, return a stable fake profile
+    const devBypass = process.env.DEV_BYPASS_AUTH === "1" || process.env.DEV_BYPASS_AUTH === "true";
+    if (devBypass) {
+      const fakeProfile = {
+        id: (user && user.id) || "dev-user-1",
+        name: (user && user.name) || "Developer",
+        email: (user && user.email) || "dev@example.com",
+        phone: null,
+        role: (user && user.role) || "admin",
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+        last_login: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      return res.status(200).json({ user: fakeProfile });
+    }
 
     const admin = getSupabaseAdmin();
 

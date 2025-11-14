@@ -75,9 +75,12 @@ export default function SmartMonitoring() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
+      const text = await response.text().catch(() => "");
+      let data: any = null;
+      try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+
       if (response.ok) {
-        const data = await response.json();
-        const binsData = Array.isArray(data.bins) ? data.bins : [];
+        const binsData = Array.isArray(data?.bins) ? data.bins : [];
         setBins(binsData);
         
         // Apply filters
@@ -143,10 +146,12 @@ export default function SmartMonitoring() {
               }
             );
 
+            const text2 = await response.text().catch(() => "");
+            let data2: any = null;
+            try { data2 = text2 ? JSON.parse(text2) : null; } catch { data2 = null; }
             if (response.ok) {
-              const data = await response.json();
-              setBins(data.bins || []);
-              setFilteredBins(data.bins || []);
+              setBins(data2?.bins || []);
+              setFilteredBins(data2?.bins || []);
             }
           } catch (error) {
             console.error("Error fetching nearby bins:", error);
@@ -168,10 +173,12 @@ export default function SmartMonitoring() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
+      const text3 = await response.text().catch(() => "");
+      let data3: any = null;
+      try { data3 = text3 ? JSON.parse(text3) : null; } catch { data3 = null; }
       if (response.ok) {
-        const data = await response.json();
-        setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
+        setNotifications(data3?.notifications || []);
+        setUnreadCount(data3?.unreadCount || 0);
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);

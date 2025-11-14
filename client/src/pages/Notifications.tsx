@@ -29,9 +29,14 @@ export default function Notifications() {
         const resp = await fetch(`${API_URL}/api/actions/history?limit=50`, {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
         });
-        const data = await resp.json();
-        if (!resp.ok) throw new Error(data.error || data.details || 'Gagal memuat histori');
-        setItems(data.history || []);
+        const text = await resp.text().catch(() => "");
+        let data: any = null;
+        try { data = text ? JSON.parse(text) : null; } catch { data = null; }
+        if (!resp.ok) {
+          const msg = data?.error || data?.details || (text && !text.trim().startsWith("<") ? text : 'Gagal memuat histori');
+          throw new Error(msg);
+        }
+        setItems(data?.history || []);
       } catch (e: any) {
         setError(e.message || String(e));
       } finally {
